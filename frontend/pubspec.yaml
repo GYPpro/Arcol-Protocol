@@ -1,0 +1,43 @@
+name: arcol_protocol
+description: A personalized information integration and display application.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # State Management
+  flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.3
+  
+  # Routing
+  go_router: ^13.0.0
+  
+  # Network
+  dio: ^5.4.0
+  
+  # UI Components
+  fl_chart: ^0.66.0
+  flutter_spinkit: ^5.2.0
+  intl: ^0.19.0
+  
+  # Local Storage
+  shared_preferences: ^2.2.2
+  
+  # Utils
+  uuid: ^4.2.2
+  url_launcher: ^6.2.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  build_runner: ^2.4.8
+  riverpod_generator: ^2.3.9
+
+flutter:
+  uses-material-design: true
