@@ -18,7 +18,6 @@ class _SiteRoutesViewState extends ConsumerState<SiteRoutesView> {
   final _processController = TextEditingController();
   final _dockerController = TextEditingController();
   String? _groupName;
-  String? _tag;
 
   @override
   void dispose() {

@@ -14,8 +14,6 @@ class TimeManagementView extends ConsumerStatefulWidget {
 
 class _TimeManagementViewState extends ConsumerState<TimeManagementView> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  Timer? _timer;
-  int _elapsedSeconds = 0;
   final _taskNameController = TextEditingController();
   final _taskDescController = TextEditingController();
   final _todoTitleController = TextEditingController();
@@ -30,23 +28,10 @@ class _TimeManagementViewState extends ConsumerState<TimeManagementView> with Si
   @override
   void dispose() {
     _tabController.dispose();
-    _timer?.cancel();
     _taskNameController.dispose();
     _taskDescController.dispose();
     _todoTitleController.dispose();
     super.dispose();
-  }
-
-  void _startTimer(int sessionId) {
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() => _elapsedSeconds++);
-    });
-  }
-
-  void _stopTimer() {
-    _timer?.cancel();
-    _timer = null;
-    _elapsedSeconds = 0;
   }
 
   @override
