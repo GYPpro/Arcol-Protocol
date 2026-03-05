@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -41,8 +42,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> _checkAuth() async {
+    developer.log('[AUTH] Checking auth...', name: 'AuthProvider');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString(AppConfig.tokenKey);
+    developer.log('[AUTH] Token found: ${token != null}', name: 'AuthProvider');
     if (token != null) {
       try {
         final response = await _apiClient.get('/auth/me');
@@ -51,6 +54,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           isAuthenticated: true,
         );
       } catch (e) {
+        developer.log('[AUTH] Token invalid, clearing...', name: 'AuthProvider');
         await prefs.remove(AppConfig.tokenKey);
         state = AuthState();
       }
@@ -58,12 +62,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> login(String username, String password) async {
+    developer.log('[AUTH] Login attempt: $username', name: 'AuthProvider');
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final response = await _apiClient.post('/auth/login', data: {
+      developer.log('[AUTH] Calling API...', name: 'AuthProvider');
+      final response = await _apiClient.postForm('/auth/login', data: {
         'username': username,
         'password': password,
       });
+      developer.log('[AUTH] Response: ${response.data}', name: 'AuthProvider');
       final token = Token.fromJson(response.data);
       
       final prefs = await SharedPreferences.getInstance();
@@ -75,15 +82,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isAuthenticated: true,
         isLoading: false,
       );
-    } catch (e) {
+      developer.log('[AUTH] Login success!', name: 'AuthProvider');
+    } catch (e, stack) {
+      developer.log('[AUTH] Login error: $e', name: 'AuthProvider');
+      developer.log('[AUTH] Stack: $stack', name: 'AuthProvider');
       state = state.copyWith(
         isLoading: false,
-        error: 'Invalid username or password',
+        error: 'Invalid username or password: $e',
       );
     }
   }
 
   Future<void> register(String username, String password, String? email) async {
+    developer.log('[AUTH] Register attempt: $username', name: 'AuthProvider');
     state = state.copyWith(isLoading: true, error: null);
     try {
       await _apiClient.post('/auth/register', data: {
@@ -91,11 +102,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
         'password': password,
         'email': email,
       });
+      developer.log('[AUTH] Registration success, logging in...', name: 'AuthProvider');
       await login(username, password);
-    } catch (e) {
+    } catch (e, stack) {
+      developer.log('[AUTH] Register error: $e', name: 'AuthProvider');
+      developer.log('[AUTH] Stack: $stack', name: 'AuthProvider');
       state = state.copyWith(
         isLoading: false,
-        error: 'Registration failed. Username may already exist.',
+        error: 'Registration failed: $e',
       );
     }
   }

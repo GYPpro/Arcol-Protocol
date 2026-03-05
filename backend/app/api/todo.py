@@ -5,16 +5,11 @@ from typing import List
 from datetime import datetime
 
 from app.database import get_db
-from app.core.security import get_current_active_user
+from app.api.deps import get_current_active_user
 from app.models.user import User, TodoItem
 from app.schemas.common import TodoItemCreate, TodoItemUpdate, TodoItemResponse
 
 router = APIRouter(prefix="/todos", tags=["todos"])
-
-
-def get_current_active_user():
-    from app.api.deps import get_current_user
-    return get_current_user
 
 
 @router.post("/", response_model=TodoItemResponse, status_code=status.HTTP_201_CREATED)

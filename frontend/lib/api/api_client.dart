@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +17,7 @@ final dioProvider = Provider<Dio>((ref) {
 
   dio.interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
+      developer.log('[API] ${options.method} ${options.path}', name: 'ApiClient');
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString(AppConfig.tokenKey);
       if (token != null) {
@@ -24,6 +26,7 @@ final dioProvider = Provider<Dio>((ref) {
       return handler.next(options);
     },
     onError: (error, handler) {
+      developer.log('[API] Error: ${error.message}', name: 'ApiClient');
       return handler.next(error);
     },
   ));
@@ -37,18 +40,33 @@ class ApiClient {
   ApiClient(this._dio);
 
   Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) {
+    developer.log('[API] GET $path', name: 'ApiClient');
     return _dio.get(path, queryParameters: queryParameters);
   }
 
   Future<Response> post(String path, {dynamic data}) {
+    developer.log('[API] POST $path', name: 'ApiClient');
     return _dio.post(path, data: data);
   }
 
+  Future<Response> postForm(String path, {required Map<String, dynamic> data}) {
+    developer.log('[API] POST FORM $path data: $data', name: 'ApiClient');
+    return _dio.post(
+      path,
+      data: FormData.fromMap(data),
+      options: Options(
+        contentType: 'application/x-www-form-urlencoded',
+      ),
+    );
+  }
+
   Future<Response> put(String path, {dynamic data}) {
+    developer.log('[API] PUT $path', name: 'ApiClient');
     return _dio.put(path, data: data);
   }
 
   Future<Response> delete(String path) {
+    developer.log('[API] DELETE $path', name: 'ApiClient');
     return _dio.delete(path);
   }
 }

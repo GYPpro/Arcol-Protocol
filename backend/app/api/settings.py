@@ -6,7 +6,7 @@ import redis
 import secrets
 
 from app.database import get_db
-from app.core.security import get_current_active_user, get_password_hash
+from app.api.deps import get_current_active_user
 from app.models.user import User, ApiKey, QueueConfig, SystemSetting
 from app.schemas.common import (
     ApiKeyCreate,

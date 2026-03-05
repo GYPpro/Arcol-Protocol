@@ -5,7 +5,7 @@ from typing import List
 from datetime import datetime
 
 from app.database import get_db
-from app.core.security import get_current_active_user
+from app.api.deps import get_current_active_user
 from app.models.user import User, TimeSession
 from app.schemas.common import (
     TimeSessionCreate,

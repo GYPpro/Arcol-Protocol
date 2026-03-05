@@ -5,7 +5,7 @@ from typing import List, Optional
 from datetime import datetime, timedelta
 
 from app.database import get_db
-from app.core.security import get_current_active_user
+from app.api.deps import get_current_active_user
 from app.models.user import User, ServerMetrics, MonitorThreshold, AlertHistory
 from app.schemas.common import (
     ServerMetricsResponse,

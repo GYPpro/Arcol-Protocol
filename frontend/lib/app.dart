@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +15,9 @@ import 'views/rss/rss_view.dart';
 import 'views/settings/settings_view.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
+  developer.log('[APP] Creating router', name: 'app');
   final authState = ref.watch(authProvider);
+  developer.log('[APP] Auth state: isAuthenticated=${authState.isAuthenticated}', name: 'app');
   
   return GoRouter(
     initialLocation: '/guest',
@@ -23,11 +26,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isLoggingIn = state.matchedLocation == '/login';
       final isGuest = state.matchedLocation == '/guest';
 
-      if (!isLoggedIn && !isGuest) {
+      // Allow /login even when not logged in
+      if (isLoggingIn) {
+        return null;
+      }
+      
+      // If not logged in, redirect to guest
+      if (!isLoggedIn) {
         return '/guest';
       }
       
-      if (isLoggedIn && (isLoggingIn || isGuest)) {
+      // If logged in and on guest or login, go to dashboard
+      if (isLoggedIn && isGuest) {
         return '/dashboard';
       }
       
@@ -79,7 +89,9 @@ class ArcolProtocolApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    developer.log('[APP] Building MaterialApp', name: 'app');
     final router = ref.watch(routerProvider);
+    developer.log('[APP] Router ready', name: 'app');
     
     return MaterialApp.router(
       title: 'Arcol Protocol',

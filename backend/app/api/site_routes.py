@@ -4,7 +4,7 @@ from sqlalchemy import select
 from typing import List, Optional
 
 from app.database import get_db
-from app.core.security import get_current_active_user
+from app.api.deps import get_current_active_user
 from app.models.user import User, SiteRoute, ProcessStatus
 from app.schemas.common import (
     SiteRouteCreate,
