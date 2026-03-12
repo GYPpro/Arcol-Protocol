@@ -45,7 +45,7 @@ class ApiClient {
   }
 
   Future<Response> post(String path, {dynamic data}) {
-    developer.log('[API] POST $path', name: 'ApiClient');
+    developer.log('[API] POST $path data: $data', name: 'ApiClient');
     return _dio.post(path, data: data);
   }
 

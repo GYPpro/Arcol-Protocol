@@ -94,15 +94,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> register(String username, String password, String? email) async {
-    developer.log('[AUTH] Register attempt: $username', name: 'AuthProvider');
+    developer.log('[AUTH] Register attempt: $username, email: $email', name: 'AuthProvider');
     state = state.copyWith(isLoading: true, error: null);
     try {
-      await _apiClient.post('/auth/register', data: {
+      developer.log('[AUTH] Sending data: username=$username, password=***, email=$email', name: 'AuthProvider');
+      final response = await _apiClient.post('/auth/register', data: {
         'username': username,
         'password': password,
-        'email': email,
+        if (email != null) 'email': email,
       });
-      developer.log('[AUTH] Registration success, logging in...', name: 'AuthProvider');
+      developer.log('[AUTH] Register response: ${response.data}', name: 'AuthProvider');
       await login(username, password);
     } catch (e, stack) {
       developer.log('[AUTH] Register error: $e', name: 'AuthProvider');

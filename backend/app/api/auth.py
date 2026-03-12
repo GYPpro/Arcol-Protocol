@@ -12,6 +12,13 @@ from app.api.deps import get_current_active_user
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+@router.get("/available")
+async def check_username_available(username: str, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.username == username))
+    user = result.scalar_one_or_none()
+    return {"available": user is None}
+
+
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.username == user.username))

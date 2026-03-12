@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../api/api_client.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/theme_provider.dart';
 
 class SettingsView extends ConsumerStatefulWidget {
   const SettingsView({super.key});
@@ -146,6 +147,8 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+    final themeState = ref.watch(themeProvider);
+    final theme = Theme.of(context);
 
     if (_loading) return const Scaffold(body: Center(child: CircularProgressIndicator()));
 
@@ -162,11 +165,77 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('User Profile', style: Theme.of(context).textTheme.titleMedium),
+                    Text('User Profile', style: theme.textTheme.titleMedium),
                     const Divider(),
                     Text('Username: ${authState.user?.username ?? "N/A"}'),
                     Text('Email: ${authState.user?.email ?? "N/A"}'),
                     Text('Created: ${authState.user?.createdAt ?? "N/A"}'),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Appearance', style: theme.textTheme.titleMedium),
+                    const Divider(),
+                    Text('Theme Mode', style: theme.textTheme.bodyMedium),
+                    const SizedBox(height: 8),
+                    SegmentedButton<ThemeMode>(
+                      segments: const [
+                        ButtonSegment(
+                          value: ThemeMode.system,
+                          icon: Icon(Icons.brightness_auto),
+                          label: Text('System'),
+                        ),
+                        ButtonSegment(
+                          value: ThemeMode.light,
+                          icon: Icon(Icons.light_mode),
+                          label: Text('Light'),
+                        ),
+                        ButtonSegment(
+                          value: ThemeMode.dark,
+                          icon: Icon(Icons.dark_mode),
+                          label: Text('Dark'),
+                        ),
+                      ],
+                      selected: {themeState.themeMode},
+                      onSelectionChanged: (Set<ThemeMode> selection) {
+                        ref.read(themeProvider.notifier).setThemeMode(selection.first);
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    Text('Theme Color', style: theme.textTheme.bodyMedium),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: availableColors.map((color) {
+                        final isSelected = themeState.seedColor.toARGB32() == color.toARGB32();
+                        return InkWell(
+                          onTap: () => ref.read(themeProvider.notifier).setSeedColor(color),
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: isSelected
+                                  ? Border.all(color: theme.colorScheme.onSurface, width: 3)
+                                  : null,
+                            ),
+                            child: isSelected
+                                ? Icon(Icons.check, color: color.computeLuminance() > 0.5 ? Colors.black : Colors.white, size: 20)
+                                : null,
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ],
                 ),
               ),
